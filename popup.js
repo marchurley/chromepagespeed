@@ -40,13 +40,13 @@ function runPagespeedCallbacks(result) {
     if (result.ruleGroups && result.ruleGroups.SPEED.score) {
         var resultNumber = result.ruleGroups.SPEED.score;
         if (resultNumber < 60) {
-            $("#result").html("<p id='poor'>Google Page Speed Score: " + "<strong style='text-decoration: underline;'>" + resultNumber + "</strong>/100<br><i class='em thumbsdown'></i> Poor score. Please optimize!</p>");
+            $("#result").html("<p id='poor'>Google Page Speed Score: " + "<strong style='text-decoration: underline;'>" + resultNumber + "</strong>/100<br>Poor score. Please optimize!</p>");
             $("#loading").hide();
         } else if (resultNumber < 80) {
-            $("#result").html("<p id='needswork'>Google Page Speed Score: " + "<strong style='text-decoration: underline;'>" + resultNumber + "</strong>/100<br><i class='em-point_right'></i> Might need some rework. Ideal score is above 80!</p>");
+            $("#result").html("<p id='needswork'>Google Page Speed Score: " + "<strong style='text-decoration: underline;'>" + resultNumber + "</strong>/100<br>Might need some rework. Ideal score is above 80!</p>");
             $("#loading").hide();
         } else {
-            $("#result").html("<p id='good'>Google Page Speed Score: " + "<strong style='text-decoration: underline;'>" + resultNumber + "</strong>/100<br><i class='em---1'></i>Great score!</p>");
+            $("#result").html("<p id='good'>Google Page Speed Score: " + "<strong style='text-decoration: underline;'>" + resultNumber + "</strong>/100<br>Great score!</p>");
             $("#loading").hide();
         }
     }
