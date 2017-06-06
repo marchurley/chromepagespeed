@@ -1,8 +1,8 @@
 //JQuery Prepare document
 $(document).ready(function() {
-    //hide loading gif on page load
+    //hide areas on page load
     $("#loading").hide();
-    $("#openlist,#imglist,#disclaimer,.hide,#downloadImageSelection,#noReco").hide();
+    $("#openlist,#imglist,#disclaimer,.hide,#downloadImageSelection,#noReco,#clickDetail").hide();
     //event handler when checkPage is clicked
     $("#checkPage").click(function() {
         //looking for active tabs
@@ -12,9 +12,11 @@ $(document).ready(function() {
             //Callback function that only runs when an active tab is found, passing the tab as argument
         }, function(tabs) {
             var url = tabs[0].url;
+            encodedUrl = encodeURIComponent(url);
             //run the calltogoogle api. pass the url as argument
             calltogoogle(url);
             //show loading gif after click on button
+            $("#or, #optImg, #googleInfo").hide();
             $("#loading").show();
         });
     });
@@ -29,13 +31,16 @@ $(document).ready(function() {
             var url = tabs[0].url;
             //prepare the url
             var google1 = "https://developers.google.com/speed/pagespeed/insights/optimizeContents?url=";
-            var urlEncode = encodeURIComponent(url);
+            encodedUrl2 = encodeURIComponent(url);
             var google2 = "&strategy=desktop";
-            var finalUrl = google1 + urlEncode + google2;
+            finalUrl = google1 + encodedUrl2 + google2;
             window.open(finalUrl);
         });
     });
 });
+
+// global variable for encoded url (can't be inside jquery document ready)
+var encodedUrl;
 
 ////////////////////////////////////////////////////////////////////////
 // Our JSONP callback. Checks for errors, then invokes our callback handlers.
@@ -43,6 +48,7 @@ function runPagespeedCallbacks(result) {
     //run this code if there are errors
     if (result.error) {
         $("#loading").hide();
+        $("#or, #optImg, #googleInfo").show();
         var errors = result.error.errors;
         for (var i = 0, len = errors.length; i < len; ++i) {
             if (errors[i].reason == 'badRequest' && API_KEY == 'yourAPIKey') {
@@ -54,33 +60,42 @@ function runPagespeedCallbacks(result) {
         return;
     }
     if (result.invalidRules) {
-        $("#loading").hide();
+        $("#loading,#checkPage").hide();
         $("#noReco").show();
     }
 
     //if we get a speed score, put it in variable and display
-    if (result.ruleGroups && result.ruleGroups.SPEED.score) {
+    if (result.ruleGroups && result.ruleGroups.SPEED && result.ruleGroups.SPEED.score) {
         var resultNumber = result.ruleGroups.SPEED.score;
+        $("#loading,#checkPage").hide();
+        $("#clickDetail").show();
         if (resultNumber < 60) {
-            $("#result").html("<p id='poor'>Google Page Speed Score: " + "<strong style='text-decoration: underline;'>" + resultNumber + "</strong>/100<br>Poor score. Please optimize!</p>");
-            $("#loading").hide();
+            $("#result").html("<p id='poor'><a href='https://developers.google.com/speed/pagespeed/insights/?url=" + encodedUrl + "' target='_blank'>Google Page Speed Score: " +
+                "<strong style='text-decoration: underline;'>" + resultNumber + "</strong>/100<br>Poor score. Please optimize!</a></p>");
         } else if (resultNumber < 80) {
-            $("#result").html("<p id='needswork'>Google Page Speed Score: " + "<strong style='text-decoration: underline;'>" + resultNumber + "</strong>/100<br>Might need some rework. Ideal score is above 80!</p>");
-            $("#loading").hide();
+          $("#result").html("<p id='needswork'><a href='https://developers.google.com/speed/pagespeed/insights/?url=" + encodedUrl + "' target='_blank'>Google Page Speed Score: " +
+              "<strong style='text-decoration: underline;'>" + resultNumber + "</strong>/100<br>Might need some rework. Ideal score is above 80!</p>");
         } else {
-            $("#result").html("<p id='good'>Google Page Speed Score: " + "<strong style='text-decoration: underline;'>" + resultNumber + "</strong>/100<br>Great score!</p>");
-            $("#loading").hide();
+          $("#result").html("<p id='good'><a href='https://developers.google.com/speed/pagespeed/insights/?url=" + encodedUrl + "' target='_blank'>Google Page Speed Score: " +
+              "<strong style='text-decoration: underline;'>" + resultNumber + "</strong>/100<br>Great score!</p>");
         }
     }
     //if we get images that needs optimization, change height & width and display them here
-    if (result.formattedResults.ruleResults && result.formattedResults.ruleResults.OptimizeImages.urlBlocks[0].urls) {
+    //always check that a property is there before evaluating it. otherwise error
+    if (result.formattedResults && result.formattedResults.ruleResults &&
+        result.formattedResults.ruleResults &&
+        result.formattedResults.ruleResults.OptimizeImages &&
+        result.formattedResults.ruleResults.OptimizeImages.urlBlocks &&
+        result.formattedResults.ruleResults.OptimizeImages.urlBlocks.length === 1 &&
+        result.formattedResults.ruleResults.OptimizeImages.urlBlocks[0].urls) {
         $("#openlist,#imglist,#disclaimer,.hide,#downloadImageSelection").show(); //show divs when there are images returned
         $("html").width(400).height(400); // Change size of plugin
+        $("#optImg, #googleInfo").show();
         $("#loading").hide(); // hide loading gif
         //put the returned images from google into a variable
         var imagearray = result.formattedResults.ruleResults.OptimizeImages.urlBlocks[0].urls;
         //put html code for image list download into variable
-        var imagelist = ["<!doctype html><html><body style='text-align: center;'><h1>These images might be too large.<br>Try to optimize below 150KB:</h1><p>"];
+        var imagelist = ["<!doctype html><html><body style='text-align: center;'><h1>These images might be too large.<br>I recommend to minimize images above 150 KB!</h1><p>"];
 
         //Add images to html
         for (var x = 0; x < imagearray.length; x++) {
@@ -109,10 +124,16 @@ function runPagespeedCallbacks(result) {
         });
     }
 
-    if (result.ruleGroups || result.formattedResults.ruleResults.OptimizeImages) {
-        $("#or, #optImg").hide();
-        console.log("yes");
-    }
+}
+
+function activeUrl() {
+    chrome.tabs.query({
+        active: true,
+        currentWindow: true
+        //Callback function that only runs when an active tab is found, passing the tab as argument
+    }, function(tabs) {
+        var activeUrl = tabs[0].url;
+    });
 }
 
 ////////////////////////////////////////////////////////////////////////

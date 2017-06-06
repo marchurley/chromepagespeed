@@ -1,72 +1,28 @@
 html {
-  width: 200px;
-  height: 200px;
-  text-align: center;
+    width: 200px;
+    height: 200px;
+    text-align: center;
 }
 
 h1 {
-  font-size: 20px;
-  margin-bottom: 25px;
+    font-size: 20px;
+    margin-bottom: 30px;
 }
 
 h3 {
-  font-size: 16px;
-  font-weight: 600;
+    font-size: 18px;
+    text-decoration: underline;
+    font-weight: 600;
 }
 
-#checkPage {
-  background-color: #4CAF50;
-  border: none;
-  color: white;
-  padding: 10px 25px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
+a {
+    text-decoration: none;
+    color: black;
+    cursor: pointer;
 }
 
-#optImg {
-  background-color: #495DBC;
-  border: none;
-  color: white;
-  padding: 10px 25px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-}
-
-#or {
-  margin-bottom: 15px;
-}
-
-#openlist, #downloadImageSelection {
-  margin: 10px;
-  font-size: 14px;
-}
-
-#disclaimer, #googleInfo {
-  font-style: italic;
-}
-
-#error, #imglist {
-  margin: 20px 0;
-}
-
-#error {
-  color: red;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-#result {
-  font-size: 18px;
-}
-
-#noReco {
-  color: red;
-  font-size: 18px;
-  font-style: italic;
+hr {
+    margin-top: 25px;
 }
 
 img.center {
@@ -75,7 +31,70 @@ img.center {
 }
 
 p {
-  font-size: 14px;
+    font-size: 14px;
+}
+
+#checkPage {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 10px 25px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#optImg, #openlist, #downloadImageSelection {
+    background-color: #495DBC;
+    border: none;
+    color: white;
+    padding: 5px 25px;
+    margin: 5px 0;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#or {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+#disclaimer, #googleInfo, #clickDetail {
+    font-style: italic;
+}
+
+#clickDetail {
+    margin-top: -15px;
+    font-weight: 600;
+}
+
+#error, #imglist {
+    margin: 20px 0;
+}
+
+#error {
+    color: red;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+#big {
+  margin: 15px;
+}
+
+#result {
+    font-size: 18px;
+}
+
+#noReco {
+    color: red;
+    font-size: 18px;
+    font-weight: 600;
 }
 
 #poor, #needswork, #good {
@@ -85,13 +104,13 @@ p {
 }
 
 #poor {
-  background-color: red;
+    background-color: red;
 }
 
 #needswork {
-  background-color: orange;
+    background-color: orange;
 }
 
 #good {
-  background-color: green;
+    background-color: green;
 }
