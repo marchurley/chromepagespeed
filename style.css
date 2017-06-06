@@ -25,12 +25,27 @@ h3 {
   font-size: 16px;
 }
 
+#optImg {
+  background-color: #495DBC;
+  border: none;
+  color: white;
+  padding: 10px 25px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+#or {
+  margin-bottom: 15px;
+}
+
 #openlist, #downloadImageSelection {
   margin: 10px;
   font-size: 14px;
 }
 
-#disclaimer {
+#disclaimer, #googleInfo {
   font-style: italic;
 }
 
@@ -46,6 +61,12 @@ h3 {
 
 #result {
   font-size: 18px;
+}
+
+#noReco {
+  color: red;
+  font-size: 18px;
+  font-style: italic;
 }
 
 img.center {

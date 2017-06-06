@@ -2,7 +2,7 @@
 $(document).ready(function() {
     //hide loading gif on page load
     $("#loading").hide();
-    $("#openlist,#imglist,#disclaimer,.hide,#downloadImageSelection").hide();
+    $("#openlist,#imglist,#disclaimer,.hide,#downloadImageSelection,#noReco").hide();
     //event handler when checkPage is clicked
     $("#checkPage").click(function() {
         //looking for active tabs
@@ -16,6 +16,23 @@ $(document).ready(function() {
             calltogoogle(url);
             //show loading gif after click on button
             $("#loading").show();
+        });
+    });
+    //download optimized images from google after button is clicked
+    $("#optImg").click(function() {
+        //looking for active tabs
+        chrome.tabs.query({
+            active: true,
+            currentWindow: true
+            //Callback function that only runs when an active tab is found, passing the tab as argument
+        }, function(tabs) {
+            var url = tabs[0].url;
+            //prepare the url
+            var google1 = "https://developers.google.com/speed/pagespeed/insights/optimizeContents?url=";
+            var urlEncode = encodeURIComponent(url);
+            var google2 = "&strategy=desktop";
+            var finalUrl = google1 + urlEncode + google2;
+            window.open(finalUrl);
         });
     });
 });
@@ -36,6 +53,11 @@ function runPagespeedCallbacks(result) {
         }
         return;
     }
+    if (result.invalidRules) {
+        $("#loading").hide();
+        $("#noReco").show();
+    }
+
     //if we get a speed score, put it in variable and display
     if (result.ruleGroups && result.ruleGroups.SPEED.score) {
         var resultNumber = result.ruleGroups.SPEED.score;
@@ -51,7 +73,7 @@ function runPagespeedCallbacks(result) {
         }
     }
     //if we get images that needs optimization, change height & width and display them here
-    if (result.formattedResults) {
+    if (result.formattedResults.ruleResults && result.formattedResults.ruleResults.OptimizeImages.urlBlocks[0].urls) {
         $("#openlist,#imglist,#disclaimer,.hide,#downloadImageSelection").show(); //show divs when there are images returned
         $("html").width(400).height(400); // Change size of plugin
         $("#loading").hide(); // hide loading gif
@@ -85,7 +107,11 @@ function runPagespeedCallbacks(result) {
         $("#downloadImageSelection").click(function() {
             downloadImageSelection(imagearray);
         });
+    }
 
+    if (result.ruleGroups || result.formattedResults.ruleResults.OptimizeImages) {
+        $("#or, #optImg").hide();
+        console.log("yes");
     }
 }
 
