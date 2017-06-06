@@ -1,0 +1,76 @@
+html {
+  width: 200px;
+  height: 200px;
+  text-align: center;
+}
+
+h1 {
+  font-size: 20px;
+  margin-bottom: 25px;
+}
+
+h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+#checkPage {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 10px 25px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
+#openlist, #downloadImageSelection {
+  margin: 10px;
+  font-size: 14px;
+}
+
+#disclaimer {
+  font-style: italic;
+}
+
+#error, #imglist {
+  margin: 20px 0;
+}
+
+#error {
+  color: red;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+#result {
+  font-size: 18px;
+}
+
+img.center {
+    display: block;
+    margin: 0 auto;
+}
+
+p {
+  font-size: 14px;
+}
+
+#poor, #needswork, #good {
+    padding: 5px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+#poor {
+  background-color: red;
+}
+
+#needswork {
+  background-color: orange;
+}
+
+#good {
+  background-color: green;
+}

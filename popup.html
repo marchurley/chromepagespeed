@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Google Page Speed Analyzer</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://afeld.github.io/emoji-css/emoji.css" rel="stylesheet">
+    <script src="jquery-3.2.1.js"></script>
+    <script src="popup.js"></script>
+</head>
+
+<body>
+    <h1 id="test">Google Page Speed Analyzer</h1>
+    <button id="checkPage">Check this page now!</button>
+    <div id="error"></div>
+    <div id="result"></div>
+    <h3 class="hide">The size of these images could be optimized*:<h3>
+    <button id="openlist">Click here to download image list as linked html-file</button>
+    <button id="downloadImageSelection">Click here to download all images individually</button>
+    <div id="imglist"></div>
+    <div id="disclaimer"><p>*I recommend to optimize images above 150 KB image size.</div>
+    <div id="loading">
+      <img src=loading.gif style="width:100px;height:100px;">
+    </div>
+</body>
+</html>
+
+<!--
+Fix image sizes
+emoji
+comment
+http://bitexperts.com/Question/Detail/3316/determine-file-size-in-javascript-without-downloading-a-file
+https://stackoverflow.com/questions/16876804/getting-image-urls-file-size-of-remotely-loaded-images
