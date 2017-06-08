@@ -94,7 +94,7 @@ function runPagespeedCallbacks(result) {
     }
 
     //if we get a speed score, put it in variable and display
-    if (result.ruleGroups && result.ruleGroups.SPEED /*&& result.ruleGroups.SPEED.score*/ ) {
+    if (result.ruleGroups && result.ruleGroups.SPEED && !isNaN(result.ruleGroups.SPEED.score) ) {
         var resultNumber = result.ruleGroups.SPEED.score;
         $("#loading,#checkPage").hide();
         $("#clickDetail").show();
