@@ -12,22 +12,25 @@
     <h1 id="test">Google Page Speed Analyzer</h1>
     <button id="checkPage">Check page speed!</button>
     <div id="result"></div>
-    <p id="clickDetail">click box to view detailed analysis<br></p>
+    <div id="resultMobile"></div>
+    <p id="clickDetail"><br></p>
     <div class="hide">
       <hr>
-      <h3>These images might be too large**:</h3>
+      <h3>Google recommends to optimize these images:</h3>
+      <input type="text" name="input" id="userInput" value=""
+      placeholder="Enter filesize in KB!">
+      <button id="filter">Show images > 0 KB</button>
     </div>
-    <button id="openlist">Download image list as linked html-file</button>
-    <button id="downloadImageSelection">Download original images individually</button>
+    <button id="openlist">Download linked html-file</button>
+    <button id="downloadImageSelection">Download original images</button>
     <div id="or">or</div>
-    <button id="optImg">Download optimized images*!</button>
+    <button id="optImg">Download optimized images*</button>
     <div id="imglist"></div>
     <div id="loading">
       <img src=loading.gif style="width:100px;height:100px;">
     </div>
     <div id="error"></div>
     <div id="noReco">No result from Google.<br id="big">Please try another website!</div>
-    <div id="googleInfo"><p>*Optimized images are provided by Google Page Speed Tools!</div>
-    <div id="disclaimer"><p>**I recommend to minimize images above 150 KB!</div>
+    <div id="googleInfo"><p>*Provided by Google!</div>
 </body>
 </html>

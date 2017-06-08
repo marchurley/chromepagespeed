@@ -5,8 +5,14 @@
     "description": "This extension will analyze a page using Google Page Speed",
     "version": "1.0",
 
+    "icons": {
+  		"16": "PS_16.png",
+  		"48": "PS_48.png",
+  		"128": "PS_128.png"
+  	},
+
     "browser_action": {
-        "default_icon": "icon.png",
+        "default_icon": "PS_48.png",
         "default_popup": "popup.html"
     },
 

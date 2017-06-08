@@ -2,7 +2,7 @@
 $(document).ready(function() {
     //hide areas on page load
     $("#loading").hide();
-    $("#openlist,#imglist,#disclaimer,.hide,#downloadImageSelection,#noReco,#clickDetail").hide();
+    $("#openlist,#imglist,#disclaimer,.hide,#downloadImageSelection,#noReco,#clickDetail,#resultMobile").hide();
     //event handler when checkPage is clicked
     $("#checkPage").click(function() {
         //looking for active tabs
@@ -37,10 +37,39 @@ $(document).ready(function() {
             window.open(finalUrl);
         });
     });
+
+    //get user input and put it in global variable
+    $("#userInput").on("keyup change", function() {
+        this.value = this.value.replace(/[^0-9\.]/g, '');
+        userInput = parseInt(this.value);
+        $("#filter").html("Show images > " + userInput + " KB");
+        if (event.keyCode == 13) {
+            $("#filter").click();
+        }
+    });
+
+    //run appendImage again when user clicks filter
+    $("#filter").click(function() {
+        $("#imglist").empty();
+        for (var x = 0; x < imagearray.length; x++) {
+            appendImage(x, imagearray, userInput);
+        }
+    });
+
 });
 
 // global variable for encoded url (can't be inside jquery document ready)
 var encodedUrl;
+// global input variable
+var userInput = 0;
+// global input image array
+var imagearray;
+// global value to download linked html file
+var imageHtml;
+//put html code for image list download into variable
+var imagelist;
+
+
 
 ////////////////////////////////////////////////////////////////////////
 // Our JSONP callback. Checks for errors, then invokes our callback handlers.
@@ -65,19 +94,21 @@ function runPagespeedCallbacks(result) {
     }
 
     //if we get a speed score, put it in variable and display
-    if (result.ruleGroups && result.ruleGroups.SPEED && result.ruleGroups.SPEED.score) {
+    if (result.ruleGroups && result.ruleGroups.SPEED /*&& result.ruleGroups.SPEED.score*/ ) {
         var resultNumber = result.ruleGroups.SPEED.score;
         $("#loading,#checkPage").hide();
         $("#clickDetail").show();
+        $("#resultMobile").show();
+        $("#clickDetail").show().html("<a href='https://developers.google.com/speed/pagespeed/insights/?url=" + encodedUrl + "' target='_blank'>click to view detailed analysis</a>");
         if (resultNumber < 60) {
-            $("#result").html("<p id='poor'><a href='https://developers.google.com/speed/pagespeed/insights/?url=" + encodedUrl + "' target='_blank'>Google Page Speed Score: " +
-                "<strong style='text-decoration: underline;'>" + resultNumber + "</strong>/100<br>Poor score. Please optimize!</a></p>");
+            $("#result").html("<p id='poor'><a href='https://developers.google.com/speed/pagespeed/insights/?url=" + encodedUrl + "' target='_blank'><span id='underline'>DESKTOP Score: " +
+                "<strong>" + resultNumber + "</strong>/100</span><br>Poor score. Please optimize!</a></p>");
         } else if (resultNumber < 80) {
-          $("#result").html("<p id='needswork'><a href='https://developers.google.com/speed/pagespeed/insights/?url=" + encodedUrl + "' target='_blank'>Google Page Speed Score: " +
-              "<strong style='text-decoration: underline;'>" + resultNumber + "</strong>/100<br>Might need some rework. Ideal score is above 80!</p>");
+            $("#result").html("<p id='needswork'><a href='https://developers.google.com/speed/pagespeed/insights/?url=" + encodedUrl + "' target='_blank'><span id='underline'>DESKTOP Score: " +
+                "<strong>" + resultNumber + "</strong>/100</span><br>Might need some rework. Ideal score is above 80!</p>");
         } else {
-          $("#result").html("<p id='good'><a href='https://developers.google.com/speed/pagespeed/insights/?url=" + encodedUrl + "' target='_blank'>Google Page Speed Score: " +
-              "<strong style='text-decoration: underline;'>" + resultNumber + "</strong>/100<br>Great score!</p>");
+            $("#result").html("<p id='good'><a href='https://developers.google.com/speed/pagespeed/insights/?url=" + encodedUrl + "' target='_blank'><span id='underline'>DESKTOP Score: " +
+                "<strong>" + resultNumber + "</strong>/100</span><br>Great score!</p>");
         }
     }
     //if we get images that needs optimization, change height & width and display them here
@@ -88,14 +119,9 @@ function runPagespeedCallbacks(result) {
         result.formattedResults.ruleResults.OptimizeImages.urlBlocks &&
         result.formattedResults.ruleResults.OptimizeImages.urlBlocks.length === 1 &&
         result.formattedResults.ruleResults.OptimizeImages.urlBlocks[0].urls) {
-        $("#openlist,#imglist,#disclaimer,.hide,#downloadImageSelection").show(); //show divs when there are images returned
-        $("html").width(400).height(400); // Change size of plugin
-        $("#optImg, #googleInfo").show();
         $("#loading").hide(); // hide loading gif
         //put the returned images from google into a variable
-        var imagearray = result.formattedResults.ruleResults.OptimizeImages.urlBlocks[0].urls;
-        //put html code for image list download into variable
-        var imagelist = ["<!doctype html><html><body style='text-align: center;'><h1>These images might be too large.<br>I recommend to minimize images above 150 KB!</h1><p>"];
+        imagearray = result.formattedResults.ruleResults.OptimizeImages.urlBlocks[0].urls;
 
         //Add images to html
         for (var x = 0; x < imagearray.length; x++) {
@@ -104,14 +130,28 @@ function runPagespeedCallbacks(result) {
 
         //download image list when button is clicked
         $("#openlist").click(function() {
+            var noList = 0; //set no list variable to 0 everytime button is clicked
             //for loop to put all the images formatted as html into imagelist variable
+            imageHtml = 0;
+            imagelist = ["<!doctype html><html><body style='text-align: center;'><h1>Google recommends to optimize these images.<br>Your filter only displays images above " +
+                userInput + "KB!</h1><p>"
+            ];
+
             for (var y = 0; y < imagearray.length; y++) {
-                var imageHtml = "<a href='" + imagearray[y].result.args[0].value +
-                    "' target='_blank'><img src='" + imagearray[y].result.args[0].value +
-                    "'style='width:200px'></a><br><strong>" +
-                    "Filesize: " + imagearray[y].result.args[0].size +
-                    " KB<br><br></strong>";
-                imagelist += imageHtml;
+                if (imagearray[y].result.args[0].size > userInput) {
+                    noList = 1; // set noList no 1 if images are found
+                    imageHtml = "<a href='" + imagearray[y].result.args[0].value +
+                        "' target='_blank'><img src='" + imagearray[y].result.args[0].value +
+                        "'style='width:200px'></a><br><strong>" +
+                        "Filesize: " + imagearray[y].result.args[0].size +
+                        " KB<br><br></strong>";
+                    imagelist += imageHtml;
+                }
+            }
+            // check if there are no images found, then alert and stop code
+            if (noList === 0) {
+                alert("No images to display!");
+                return;
             }
             imagelist += "</body></html>";
             //call download function the download the list
@@ -126,14 +166,23 @@ function runPagespeedCallbacks(result) {
 
 }
 
-function activeUrl() {
-    chrome.tabs.query({
-        active: true,
-        currentWindow: true
-        //Callback function that only runs when an active tab is found, passing the tab as argument
-    }, function(tabs) {
-        var activeUrl = tabs[0].url;
-    });
+////////////////////////////////////////////////////////////////////////
+//Our JSONP callback for MOBILE.
+function runPagespeedCallbacksMobile(result) {
+    //if we get a speed score, put it in variable and display
+    if (result.ruleGroups && result.ruleGroups.SPEED /*&& result.ruleGroups.SPEED.score*/ ) {
+        var resultNumber = result.ruleGroups.SPEED.score;
+        if (resultNumber < 60) {
+            $("#resultMobile").html("<p id='poor'><a href='https://developers.google.com/speed/pagespeed/insights/?url=" + encodedUrl + "' target='_blank'><span id='underline'>MOBILE Score: " +
+                "<strong>" + resultNumber + "</strong>/100</span><br>Poor score. Please optimize!</a></p>");
+        } else if (resultNumber < 80) {
+            $("#resultMobile").html("<p id='needswork'><a href='https://developers.google.com/speed/pagespeed/insights/?url=" + encodedUrl + "' target='_blank'><span id='underline'>MOBILE Score: " +
+                "<strong>" + resultNumber + "</strong>/100</span><br>Might need some rework. Ideal score is above 80!</p>");
+        } else {
+            $("#resultMobile").html("<p id='good'><a href='https://developers.google.com/speed/pagespeed/insights/?url=" + encodedUrl + "' target='_blank'><span id='underline'>MOBILE Score: " +
+                "<strong>" + resultNumber + "</strong>/100</span><br>Great score!</p>");
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -146,14 +195,21 @@ function appendImage(x, imagearray) {
         success: function() {
             var fileSize = req.getResponseHeader("Content-Length");
             kilobyte = parseFloat(Math.round((fileSize / 1000) * 100) / 100).toFixed(2);
-            // Append to DOM
-            $("#imglist").append("<p><a href='" + imagearray[x].result.args[0].value +
-                "' target='_blank'><img src='" + imagearray[x].result.args[0].value +
-                "'style='width:200px'></a><br><strong>" +
-                "Filesize: " + kilobyte +
-                " KB</strong></p><br>");
+            kilobyte2 = parseFloat(kilobyte, 10);
             //Add size to imagearray
-            imagearray[x].result.args[0].size = kilobyte;
+            imagearray[x].result.args[0].size = kilobyte2;
+            // Append to DOM
+            if (kilobyte2 > userInput) {
+                $("#openlist,#imglist,#disclaimer,.hide,#downloadImageSelection").show(); //show divs when there are images returned
+                $("html").width(600).height(400).css("background-color", "#f1f1f1"); // Change size of plugin
+                $("#optImg, #openlist, #downloadImageSelection").width(270);
+                $("#optImg, #googleInfo").show();
+                $("#imglist").append("<p><a href='" + imagearray[x].result.args[0].value +
+                    "' target='_blank'><img src='" + imagearray[x].result.args[0].value +
+                    "'style='width:200px'></a><br><strong>" +
+                    "Filesize: " + kilobyte +
+                    " KB</strong></p><br>");
+            }
         }
     });
 }
@@ -190,23 +246,51 @@ function calltogoogle(url) {
     // to discover any callbacks registered below, but this can be
     // synchronous in your code.
     setTimeout(runPagespeed, 0);
+
+    function runPagespeedMobile() {
+        //create an empty script tag, with text javascript and async code
+        var s = document.createElement('script');
+        s.type = 'text/javascript';
+        s.async = true;
+        //build the query for the api call and run the callback function with the result
+        var query = [
+            'url=' + URL_TO_GET_RESULTS_FOR,
+            'callback=runPagespeedCallbacksMobile',
+            'strategy=mobile',
+            'key=' + API_KEY,
+            //join these 3 together with a & between
+        ].join('&');
+        //put the api_url + the created query (with the function stored inside) in a source tag
+        s.src = API_URL + query;
+        //place the s variable with the url & query with function stored inside
+        //before the end of the head-tag in the popup.html
+        document.head.insertBefore(s, null);
+    }
+    setTimeout(runPagespeedMobile, 0);
 }
 
 ////////////////////////////////////////////////////////////////////////
 //Function to download all images individually from the imagearray and give them the filename
 function downloadImageSelection(imagearray) {
+    var noDownload = 0; // set no download variable to 0
     var link = document.createElement('a'); // adding a-tag to empty link variable
     link.style.display = 'none'; //setting the display attribute to none, they a-tags won't be displayed
     document.body.appendChild(link); //adding all the links to the body of the page
 
     //loop to get all images individually
     for (var i = 0; i < imagearray.length; i++) {
-        var imageUrl = imagearray[i].result.args[0].value; //getting the image url
-        var urlPar = imageUrl.split("/"); //creating an object with all parts of the url split where there is a "/"
-        var imageName = urlPar[urlPar.length - 1]; //taking the last entry of the image, which is the image name
-        link.setAttribute('href', imagearray[i].result.args[0].value); //add href attribute and urls to link variable
-        link.setAttribute('download', imageName); // add download and name to link attribute
-        link.click(); // manually clicking the link
+        if (imagearray[i].result.args[0].size > userInput) {
+            noDownload = 1;
+            var imageUrl = imagearray[i].result.args[0].value; //getting the image url
+            var urlPar = imageUrl.split("/"); //creating an object with all parts of the url split where there is a "/"
+            var imageName = urlPar[urlPar.length - 1]; //taking the last entry of the image, which is the image name
+            link.setAttribute('href', imagearray[i].result.args[0].value); //add href attribute and urls to link variable
+            link.setAttribute('download', imageName); // add download and name to link attribute
+            link.click(); // manually clicking the link
+        }
+    }
+    if (noDownload === 0) {
+        alert("No images to download!");
     }
     document.body.removeChild(link); //removing all the links again from the body of the page
 }
